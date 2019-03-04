@@ -1,0 +1,185 @@
+{% extends "blogs/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}detail{% endblock %}
+{% block main %}
+<h3>{{ blog.title }}
+    <span style="float:right;">
+        <span id="like" class="btn-group" role="group" aria-label="Basic example">
+            {% if user not in blog.blog_like_users.all %}
+            <button type="button" id="new_like" data-id="{{ blog.id }}" class="btn btn-secondary btn-sm">点赞</button>
+            {% else %}
+            <button type="button" id="new_dislike" data-id="{{ blog.id }}" class="btn btn-secondary btn-sm">取消点赞</button>
+            {% endif %}
+            <button type="button" id="like_num" class="btn btn-sm">{{ blog.blog_like_users.all.count }}</button>
+        </span>
+        <span id="follow" class="btn-group" role="group" aria-label="Basic example">
+            {% if user not in blog.author.profile.fan_users.all %}
+            <button type="button" id="new_follow" data-id="{{ blog.id }}" class="btn btn-secondary btn-sm">关注</button>
+            {% else %}
+            <button type="button" id="new_unfollow" data-id="{{ blog.id }}" class="btn btn-secondary btn-sm">取消关注</button>
+            {% endif %}
+            <button type="button" id="follow_num" class="btn btn-sm">{{ blog.author.profile.fan_users.all.count }}</button>
+        </span>
+    </span>
+</h3>
+<h6 class="text-muted mt-0"><span>作者: {{ blog.author.username }}</span><span class="col-sm-12">发布时间: {{ blog.date }}</span></h6>
+<h6 class="text-muted mt-0"><span>关键词:</span><span class="col-sm-12">{{ blog.label }}</span></h6>
+<hr/>
+<div class="content-section mt-3">
+    {{ blog.text | safe }}
+</div>
+<h4>评论<span class="text-muted" style="margin-left:20px;font-size:15px;">(<a href="#">共 {{ blog_comments_sum }} 条评论</a>)</span></h4>
+<hr color="#DC143C" style="height:2px;"/>
+<div style="width:80%;">
+    {% if user.is_authenticated %}
+    <div class="media">
+        <img src="{{ user.profile.header.url }}" class="mr-3" style="height:50px;width:50px;">
+        <form class="media-body" method="post" action="{% url 'blogs:blog_detail' blog.id %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea class="form-control" id="comment" name="comment" rows="2"></textarea>
+            </div>
+            <div style="float:right;" class="form-group">
+                <span style="font-size:15px;margin-right:10px;">限制140字!</span>
+                <button type="submit" class="btn btn-primary btn-sm">评论</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    <h6 style="background-color:#DCDCDC;margin-bottom:15px;">精彩评论</h6>
+    {% for blog_comment in blog_comments %}
+    <div class="media">
+        <img src="{{ blog_comment.author.profile.header.url }}" class="mr-3" style="height:50px;width:50px;">
+        <div class="media-body">
+            <h5 class="mt-0"><a href="#">{{ blog_comment.author.username }}</a></h5>
+            <p>{{ blog_comment.text }}</p>
+            <p><span>{{ blog_comment.date }}</span>
+                <button class="btn btn-light btn-sm" data-toggle="collapse" data-target="#collapseExample1{{ blog_comment.id }}" aria-expanded="false" aria-controls="collapseExample">
+                    查看回复
+                </button>
+                <span style="float:right;" id="test_blog_comment">
+                    {% if user in blog_comment.comment_like_users.all %}
+                    <button id="dislike_button_{{ blog_comment.id }}" data-f="{{ blog_comment.id }}" class="btn btn-light btn-sm" onclick="vote_blog_comment(this)"><i id="dislike_i_{{ blog_comment.id }}" class="far fa-thumbs-up text-danger"></i></button>
+                    {% else %}
+                    <button id="like_button_{{ blog_comment.id }}" data-f="{{ blog_comment.id }}" class="btn btn-light btn-sm" onclick="vote_blog_comment(this)"><i id="like_i_{{ blog_comment.id }}" class="far fa-thumbs-up text-muted"></i></button>
+                    {% endif %}
+                    <span id="{{ blog_comment.id }}" style="margin-right:10px;">{{ blog_comment.comment_like_users.all.count }}</span>
+                    <button class="btn btn-light btn-sm" data-toggle="collapse" data-target="#collapseExample{{ blog_comment.id }}" aria-expanded="false" aria-controls="collapseExample">
+                        回复
+                    </button>
+                </span>
+            </p>
+            <div class="collapse" id="collapseExample{{ blog_comment.id }}">
+                <div class="card card-body">
+                    <p>回复{{ blog_comment.author.username }}:</p>
+                    <form method="post" action="{% url 'blogs:reply_comment' blog_comment.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" id="reply_comment_{{ blog_comment.id }}" name="reply_comment" rows="1"></textarea>
+                        </div>
+                        <div style="float:right;" class="form-group">
+                            <span style="font-size:15px;margin-right:10px;">限制140字!</span>
+                            <button type="submit" class="btn btn-primary btn-sm">评论</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="collapse" id="collapseExample1{{ blog_comment.id }}">
+            {% for reply_comment in blog_comment.reply_comments.all %}
+            <div class="media mt-3 content-section">
+                <img src="{{ reply_comment.author.profile.header.url }}" class="mr-3" style="height:50px;width:50px;">
+                <div class="media-body">
+                    <h5 class="mt-0"><a href="#">{{ reply_comment.author.username }}</a></h5>
+                    <p>{{ reply_comment.text }}</p>
+                    <p><span>{{ reply_comment.date }}</span>
+                        <span style="float:right;" id="test_reply_comment">
+                            {% if user in reply_comment.reply_comment_like_users.all %}
+                            <button id="dislike_button_{{ reply_comment.id }}" data-f="{{ reply_comment.id }}" class="btn btn-light btn-sm" onclick="vote_reply_comment(this)"><i id="dislike_i_{{ reply_comment.id }}" class="far fa-thumbs-up text-danger"></i></button>
+                            {% else %}
+                            <button id="like_button_{{ reply_comment.id }}" data-f="{{ reply_comment.id }}" class="btn btn-light btn-sm" onclick="vote_reply_comment(this)"><i id="like_i_{{ reply_comment.id }}" class="far fa-thumbs-up text-muted"></i></button>
+                            {% endif %}
+                            <span id="{{ reply_comment.id }}" style="margin-right:10px;">{{ reply_comment.reply_comment_like_users.all.count }}</span>
+                            <button class="btn btn-light btn-sm">
+                                回复
+                            </button>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+    <hr/>
+    {% endfor %}
+</div>
+{% endblock main %}
+
+{% block other %}
+<script src="/static/js/main.js"></script>
+<script>
+    function vote_blog_comment(obj) {
+        var ids = new Array();
+        ids = obj.id.split('_')
+        var blog_comment_id = ids[2];
+        $.ajax({
+            url: '/blog/vote_blog_comment/',
+            type: 'POST',
+            data: {blog_comment_id: blog_comment_id},
+
+            success: function(data) {
+                if (data === 'up') {
+                    var up_id = "#like_i_"+blog_comment_id;
+                    var up_count = document.getElementById(blog_comment_id);
+                    var count = Number(up_count.innerText);
+                    $(up_id).removeClass("text-muted");
+                    $(up_id).addClass("text-danger");
+                    up_count.innerText = String(count+1);
+                }else{
+                    var down_id = "#dislike_i_"+blog_comment_id;
+                    var down_count = document.getElementById(blog_comment_id);
+                    var count = Number(down_count.innerText);
+                    $(down_id).removeClass("text-danger");
+                    $(down_id).addClass("text-muted");
+                    down_count.innerText = String(count-1);
+                }
+            },
+            error: function(data){
+                alert("error");
+            },
+        });
+    }
+
+    function vote_reply_comment(obj) {
+        var ids = new Array();
+        ids = obj.id.split('_')
+        var reply_comment_id = ids[2];
+        $.ajax({
+            url: '/blog/vote_reply_comment/',
+            type: 'POST',
+            data: {reply_comment_id: reply_comment_id},
+
+            success: function(data) {
+                if (data === 'up') {
+                    var up_id = "#like_i_"+reply_comment_id;
+                    var up_count = document.getElementById(reply_comment_id);
+                    var count = Number(up_count.innerText);
+                    $(up_id).removeClass("text-muted");
+                    $(up_id).addClass("text-danger");
+                    up_count.innerText = String(count+1);
+                }else{
+                    var down_id = "#dislike_i_"+reply_comment_id;
+                    var down_count = document.getElementById(reply_comment_id);
+                    var count = Number(down_count.innerText);
+                    $(down_id).removeClass("text-danger");
+                    $(down_id).addClass("text-muted");
+                    down_count.innerText = String(count-1);
+                }
+            },
+            error: function(data){
+                alert("error");
+            },
+        });
+    }
+</script>
+{% endblock other %}

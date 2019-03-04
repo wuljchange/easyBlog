@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{# Load the tag library #}
+{% load bootstrap4 %}
+
+{# Load js and css #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
+<html>
+  <head>
+      {% load static %}
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+      <link rel="stylesheet" href="{% static 'css/main.css' %}">
+      <link rel="stylesheet" href="{% static 'fontawesome-free-5.7.2-web/css/all.css' %}">
+      <link rel="shortcut icon" type="image/png" href="https://cdn1.iconfinder.com/data/icons/fitness-icon-collection/100/pages-16.png">
+      <!--displayed in tab-->
+    <title>{% block title %} {% endblock %}</title>
+  </head>
+  <body>
+  <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+          <div class="container">
+              <a class="navbar-brand d-none d-lg-inline-block" href="{% url 'blogs:index' %}"><i class="fas fa-blog fa-2x"></i> <span style="font-size:35px;"><strong>Easy Blog</strong></span></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <form class="form-inline my-2 my-lg-0" method="get" action="{% url 'blogs:search' %}" style="margin-left:20px;">
+                  <div class="input-group">
+                      <input type="text" name="easy_search" id="easy-search" class="form-control" placeholder="search" aria-label="search" aria-describedby="button-submit">
+                      <div class="input-group-append">
+                          <button class="btn btn-primary" type="submit" id="button-submit"><i class="fas fa-search"></i></button>
+                      </div>
+                  </div>
+              </form>
+              <ul class="navbar-nav ml-auto flex-nowrap">
+                  {% if user.is_authenticated %}
+                  <li class="nav-item">
+                      <a class="navbar-brand d-none d-lg-inline-block" href="{% url 'blogs:create' %}"><i class="fas fa-plus"></i><span style="margin-left:5px;">新建博客</span></a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="navbar-brand d-none d-lg-inline-block dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <img src="{{ user.profile.header.url }}" style="height:30px;width:30px;">
+                      </a>
+                      <div class="dropdown-menu dropdown-menu-right base-drop" aria-labelledby="navbarDropdown">
+                          <a class="dropdown-item" href="#"><i class="far fa-address-card"></i><span style="margin-left:10px;">{{ user.username }}</span></a>
+                          <a class="dropdown-item" href="{% url 'blogs:view_profile' %}"><i class="fas fa-home"></i><span style="margin-left:10px;">主页</span></a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="{% url 'blogs:like_blogs' %}"><i class="far fa-heart"></i><span style="margin-left:12px;">喜欢</span></a>
+                          <a class="dropdown-item" href="{% url 'blogs:follow_users' %}"><i class="fab fa-linkedin"></i><span style="margin-left:13px;">关注</span></a>
+                          <a class="dropdown-item" href="{% url 'blogs:fan_users' %}"><i class="fab fa-gratipay"></i><span style="margin-left:13px;">粉丝</span></a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="{% url 'blogs:edit_profile' %}"><i class="fas fa-user-edit"></i><span style="margin-left:9px;">编辑</span></a>
+                          <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i><span style="margin-left:13px;">注销</span></a>
+                      </div>
+                  </li>
+                  {% else %}
+                  <li class="nav-item">
+                      <a class="navbar-brand d-none d-lg-inline-block" href="/register"><i class="fas fa-registered"></i> 注册</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="navbar-brand d-none d-lg-inline-block" href="/login"><i class="fas fa-sign-in-alt"></i> 登录</a>
+                  </li>
+                  {% endif %}
+              </ul>
+          </div>
+          </div>
+      </nav>
+  </header>
+
+    <main class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% block main %} {% endblock %}
+                {% block other %} {% endblock %}
+            </div>
+        </div>
+    </main>
+
+  </body>
+</html>

@@ -1,0 +1,83 @@
+{% extends 'blogs/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}home{{ form.media }}
+{% endblock %}
+{% block main %}
+<div class="content-section">
+    <div class="media">
+        <img src="{{ user.profile.header.url }}" class="align-self-start mr-3" style="height:100px;width:100px;">
+        <div class="media-body" style="margin-top:15px;">
+            <h4 class="mt-0">{{ user.username }}
+                <span style="float:right;margin-right:50px;font-size:18px;margin-top:10px;">
+                    <span style="margin-right:10px;">{{ sum_like_num }} 获赞</span>
+                    <span style="margin-right:10px;">{{ user.profile.follow_users.all.count }} 关注</span>
+                    <span>{{ user.profile.fan_users.all.count }} 粉丝</span>
+                </span>
+            </h4>
+            <p>
+                <label>标签:</label>
+                <span style="font-size:15px;">{{ user.profile.label }}</span>
+            </p>
+        </div>
+    </div>
+    <div style="margin-top:20px;">
+        <h5><strong>自我介绍</strong></h5>
+        <p style="font-size:16px;">{{ user.profile.introduction }}</p>
+    </div>
+    <hr/>
+    <div>
+        <h5><strong>我的博客</strong></h5>
+        {% for blog in blogs %}
+        <div class="card w-100">
+        <div class="card-body">
+          <h5 class="card-title"><a href="/blog/detail/{{ blog.id }}" class="link-unstyled">{{ blog.title }}</a></h5>
+          <p class="card-text">{{ blog.subtitle | default:""}}</p>
+            <p class="card-text">{{ blog.label | default:""}}<span style="float:right;"><i class="far fa-heart fa-x"></i><span class="col-sm-12" style="margin-right:50px;font-size:20px;color:green;">{{ blog.blog_like_users.all.count }}</span></span></p>
+          <p class="card-text"><small class="text-muted">{{ blog.author.username }}<br>{{ blog.date }}</small></p>
+        </div>
+        </div>
+        {% endfor %}
+        <!-- Pagination -->
+        {% if blogs.has_other_pages %}
+        <nav aria-label="page">
+            <ul class="pagination justify-content-center">
+        {% if blogs.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ blogs.previous_page_number }}" tabindex="-1">Prev</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Prev</a>
+        </li>
+        {% endif %}
+
+        {% for i in blogs.paginator.page_range %}
+        {% if blogs.number == i %}
+        <li class="page-item active">
+            <a class="page-link" href="?page={{ i }}">{{ i }} <span class="sr-only">(current)</span></a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if blogs.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ blogs.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">Next</a>
+        </li>
+        {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <div class="border-top pt-3">
+    </div>
+</div>
+{% endblock main %}

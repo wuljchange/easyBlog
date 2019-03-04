@@ -1,0 +1,77 @@
+{% extends 'blogs/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}follow{{ form.media }}
+{% endblock %}
+{% block main %}
+<div class="content-section">
+    <div>
+        <h5><strong>我的关注</strong></h5>
+        <br>
+        <div class="card-columns" style="column-count:2;">
+            {% for follow_user in follow_users %}
+            <div class="card mb-3" style="max-width:540px;">
+                <div class="row no-gutters">
+                    <div class="col-md-4">
+                        <img src="{{ follow_user.profile.header.url }}" class="card-img" >
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ follow_user.username }}</h5>
+                            <p class="card-text"><strong>标签: </strong>{{ follow_user.profile.label }}</p>
+                            <p class="card-text" >
+                                <span style="margin-right:10px;">{{ follow_user.profile.follow_users.all.count }} 关注</span>
+                                <span>{{ follow_user.profile.fan_users.all.count }} 粉丝</span>
+                            </p>
+                            <a href="{% url 'blogs:view_other_profile' follow_user.id %}"><button class="btn btn-primary btn-sm">查看主页</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Pagination -->
+        {% if follow_users.has_other_pages %}
+        <br>
+        <nav aria-label="page">
+            <ul class="pagination justify-content-center">
+        {% if follow_users.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ follow_users.previous_page_number }}" tabindex="-1">Prev</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Prev</a>
+        </li>
+        {% endif %}
+
+        {% for i in follow_users.paginator.page_range %}
+        {% if follow_users.number == i %}
+        <li class="page-item active">
+            <a class="page-link" href="?page={{ i }}">{{ i }} <span class="sr-only">(current)</span></a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if follow_users.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ follow_users.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">Next</a>
+        </li>
+        {% endif %}
+            </ul>
+        </nav>
+        <br>
+        {% endif %}
+    </div>
+
+    <div class="border-top pt-3">
+    </div>
+</div>
+{% endblock main %}

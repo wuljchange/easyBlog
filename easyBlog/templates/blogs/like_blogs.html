@@ -1,0 +1,58 @@
+{% extends "blogs/base.html" %}
+{% block title %}like{% endblock %}
+{% block main %}
+{% if user.is_authenticated %}
+<h3><strong>收藏博客</strong></h3>
+<hr/>
+{% for blog in blogs %}
+      <div class="card w-100">
+        <div class="card-body">
+          <h5 class="card-title"><a href="/blog/detail/{{ blog.id }}" class="link-unstyled">{{ blog.title }}</a></h5>
+          <p class="card-text">{{ blog.subtitle | default:""}}</p>
+            <p class="card-text">{{ blog.label | default:""}}<span style="float:right;"><i class="far fa-heart fa-x"></i><span class="col-sm-12" style="margin-right:50px;font-size:20px;color:green;">{{ blog.blog_like_users.all.count }}</span></span></p>
+          <p class="card-text"><small class="text-muted">{{ blog.author.username }}<br>{{ blog.date }}</small></p>
+        </div>
+      </div>
+{% endfor %}
+<!-- Pagination -->
+{% if blogs.has_other_pages %}
+<nav aria-label="page">
+    <ul class="pagination justify-content-center">
+        {% if blogs.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ blogs.previous_page_number }}" tabindex="-1">Prev</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1">Prev</a>
+        </li>
+        {% endif %}
+
+        {% for i in blogs.paginator.page_range %}
+        {% if blogs.number == i %}
+        <li class="page-item active">
+            <a class="page-link" href="?page={{ i }}">{{ i }} <span class="sr-only">(current)</span></a>
+        </li>
+        {% else %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+
+        {% if blogs.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ blogs.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% else %}
+<h3>Welcome!</h3><br><h4>Please Login to Continue.</h4>
+{% endif %}
+{% endblock %}

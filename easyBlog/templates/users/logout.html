@@ -1,0 +1,10 @@
+{% extends 'blogs/base.html' %}
+{% block title %}注销{% endblock %}
+{% block main %}
+    <h2>你已退出登录</h2>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            <a href="{% url 'login' %}">重新登录</a>
+        </small>
+    </div>
+{% endblock main %}

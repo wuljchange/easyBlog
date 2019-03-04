@@ -1,0 +1,31 @@
+{% extends 'blogs/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}edit{{ form.media }}
+{% endblock %}
+{% block main %}
+<div class="content-section">
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="text-muted">用户名:</label>
+            <h4>{{ user.username }}</h4>
+        </div>
+        <div class="form-group">
+            <label class="text-muted">更换头像:</label>
+            <input class="form-control" type="file" name="header" style="width:30%;"/>
+        </div>
+        <div class="form-group">
+            <label class="text-muted">标签:</label>
+            <input name="label" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+            <label class="text-muted">自我介绍:</label>
+            <textarea name="introduction" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">保存</button>
+        </div>
+    </form>
+    <div class="border-top pt-3">
+    </div>
+</div>
+{% endblock main %}

@@ -1,0 +1,24 @@
+{% extends 'blogs/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}create{{ form.media }}
+{% endblock %}
+{% block main %}
+<div class="content-section">
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">新建博客</legend>
+            {{ form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit">发布</button>
+        </div>
+    </form>
+    <div class="border-top pt-3">
+    </div>
+</div>
+{% endblock main %}
+{% block other %}
+<script type="text/javascript" src="../../static/ckeditor/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="../../static/ckeditor/ckeditor-init.js"></script>
+{% endblock other %}
