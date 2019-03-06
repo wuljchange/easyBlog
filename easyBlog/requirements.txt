@@ -7,4 +7,5 @@ db==0.1.1
 db-sqlite3==0.0.1
 dj-static==0.0.6
 Pillow==5.4.1
+django-markdownx==2.0.23
 
